@@ -1,27 +1,30 @@
 import pygame
+import sys
 import time
+from Monster import *
 from random import *
 
-blue = (113, 177, 227)
-white = (255, 255, 255)
+print(sys.version)
 
 pygame.init()
 
 surfaceW = 320
 surfaceH = 160
 
-ballonW = 50
-ballonH = 66
-
+# Creation of the window
 surface = pygame.display.set_mode((surfaceW, surfaceH))
 pygame.display.set_caption("Python TD")
 clock = pygame.time.Clock()
 
-#img = pygame.image.load('Ballon01.png')
 img_wall = pygame.image.load('wall.png')
 img_grass = pygame.image.load('grass.png')
 img_path = pygame.image.load('path.png')
 
+# Creation of snakes (appended to Monster.monster_list)
+for i in range(0, 5):
+    snake = Monster(surface, 10, (-i*20), 80, 'snake.png')
+
+# Read through map.txt file to draw the map
 with open('map.txt') as file:
     lines = file.readlines()
 
@@ -99,14 +102,15 @@ def main():
                         surface.blit(img_path, (32*jmap, 32*imap))
                     if c == '9':
                         surface.blit(img_grass, (32*jmap, 32*imap))
-                    print str(jmap) + " " + str(imap)
+                    print(str(jmap) + " " + str(imap))
                     jmap += 1
                 jmap = 0
                 imap += 1
             map_generated = True
-
+        for monster in Monster.monster_list:
+            monster.paint()
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(30)
 
 main()
 pygame.quit()
