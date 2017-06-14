@@ -71,7 +71,7 @@ def message(msg):
     main()
 
 def gameOver():
-    message("Boom!")
+    message("Boom!Badaboom")
 
 def ballon(x, y, img):
     surface.blit(img, (x, y))
