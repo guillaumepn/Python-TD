@@ -1,4 +1,5 @@
 import pygame
+import Player
 
 class Monster():
     monster_count = 0
@@ -20,7 +21,7 @@ class Monster():
 
     def move(self):
         self.getDirection()
-        print(str(self.posY) + " " + self.direction)
+        # print(str(self.posY) + " " + self.direction)
         if self.direction == "right":
             self.posX += 1
 
@@ -42,6 +43,9 @@ class Monster():
             self.direction = "down"
         if self.isOn() == 6:
             self.direction = "left"
+        # if self.isOn() == 7: # End of path
+            # Player.hp -= 1
+            # Monster.monster_list.remove(self)
 
     def isOn(self):
         diffX = 0
@@ -50,5 +54,5 @@ class Monster():
         if self.direction == "up": diffY = 31
         i = int((self.posY + diffY) / 32)
         j = int((self.posX + diffX) / 32)
-        print(self.grid[i][j])
+        # print(self.grid[i][j])
         return int(self.grid[i][j])

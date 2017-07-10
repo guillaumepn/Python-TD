@@ -9,7 +9,7 @@ print(sys.version)
 
 pygame.init()
 
-SCR_WIDTH = 800
+SCR_WIDTH = 960
 SCR_HEIGHT = 640
 
 # Creation of the window
@@ -19,14 +19,20 @@ surface = pygame.display.set_mode(
     SRCALPHA
 )
 
-surface.fill((0,0,0))
+surface.fill((255, 255, 255))
 pygame.display.set_caption("Python TD")
 clock = pygame.time.Clock()
 
-img_wall = pygame.image.load('wall.png').convert()
-img_grass = pygame.image.load('grass.png').convert()
-img_path = pygame.image.load('path.png').convert()
+# img_wall = pygame.image.load('wall.png').convert()
+# img_grass = pygame.image.load('grass.png').convert()
+# img_path = pygame.image.load('path.png').convert()
+
 background = pygame.image.load('assets/map01.png').convert()
+play = pygame.image.load('assets/play.png').convert_alpha()
+pause = pygame.image.load('assets/pause.png').convert_alpha()
+playPause = play
+guipanel = pygame.image.load('assets/gui-panel.png').convert()
+
 surface.blit(background, (0,0))
 
 # Read through map.txt file to draw the map
@@ -86,6 +92,16 @@ def replayOrQuit():
 # def ballon(x, y, img):
 #     surface.blit(img, (x, y))
 
+def isOn(mouse_pos):
+    i = 0
+    j = 0
+    type = 0
+    if mouse_pos[0] >= 0 and mouse_pos[0] < 800 and mouse_pos[1] >= 0 and mouse_pos[1] < 640:
+        i = int((mouse_pos[0]) / 32)
+        j = int((mouse_pos[1]) / 32)
+        type = int(lines[j][i])
+    return (i, j, type)
+
 def main():
     imap = 0
     jmap = 0
@@ -94,9 +110,23 @@ def main():
     map_generated = False
 
     while not game_over:
+        surface.blit(background, (0, 0))
+
+        # GUI:
+        surface.blit(guipanel, (800, 0))
+        surface.blit(playPause, (832, 32))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
+
+            if event.type == pygame.MOUSEMOTION:
+                mouse_pos = pygame.mouse.get_pos()
+                if isOn(mouse_pos)[2] == 9: # Can put a tower (cursor on grass tile)
+                    pygame.draw.rect(surface, (255, 255, 255), (isOn(mouse_pos)[0]*32, isOn(mouse_pos)[1]*32, 31, 31), 1)
+                else:
+                    pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0]*32, isOn(mouse_pos)[1]*32, 31, 31), 1)
+
 
         # if map_generated == False:
         #     for line in lines:
@@ -125,7 +155,6 @@ def main():
         #         imap += 1
         #     map_generated = True
         # for monster in Monster.monster_list:
-        surface.blit(background, (0,0))
 
         for monster in Monster.monster_list:
             monster.move()
