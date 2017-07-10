@@ -3,6 +3,7 @@ import sys
 import time
 from pygame.locals import *
 from Monster import *
+from Tower import *
 from random import *
 
 print(sys.version)
@@ -27,24 +28,11 @@ clock = pygame.time.Clock()
 # img_grass = pygame.image.load('grass.png').convert()
 # img_path = pygame.image.load('path.png').convert()
 
-background = pygame.image.load('assets/map01.png').convert()
-play = pygame.image.load('assets/play.png').convert_alpha()
-pause = pygame.image.load('assets/pause.png').convert_alpha()
-playPause = play
-guipanel = pygame.image.load('assets/gui-panel.png').convert()
-
-surface.blit(background, (0,0))
-
 # Read through map.txt file to draw the map
 with open('assets/map01.txt') as file:
     lines = file.readlines()
 
 lines = [x.strip() for x in lines]
-
-# Creation of snakes (appended to Monster.monster_list)
-for i in range(0, 5):
-    snake = Monster(surface, 10, (-i*20), 96, 'snake.png', lines)
-
 
 # def score(compte):
 #     font = pygame.font.Font('BradBunR.ttf', 16)
@@ -103,8 +91,29 @@ def isOn(mouse_pos):
     return (i, j, type)
 
 def main():
+    # Background :
+    background = pygame.image.load('assets/map01.png').convert()
+    # GUI buttons and panel :
+    play = pygame.image.load('assets/play.png').convert_alpha()
+    pause = pygame.image.load('assets/pause.png').convert_alpha()
+    playPause = play
+    guipanel = pygame.image.load('assets/gui-panel.png').convert()
+    # Towers :
+    # tower01 = pygame.image.load('assets/tower01.png').convert_alpha()
+
+    # Creation of snakes (appended to Monster.monster_list)
+    for i in range(0, 5):
+        snake = Monster(surface, 10, (-i * 20), 96, 'snake.png', lines)
+
+    surface.blit(background, (0, 0))
+
     imap = 0
     jmap = 0
+    mouse_pos = 0
+    paused = True
+    canBuild = False
+    squareX = 0
+    squareY = 0
 
     game_over = False
     map_generated = False
@@ -114,51 +123,49 @@ def main():
 
         # GUI:
         surface.blit(guipanel, (800, 0))
-        surface.blit(playPause, (832, 32))
+        btn_playPause = surface.blit(playPause, (832, 32))
 
+        # Events and controls :
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
 
             if event.type == pygame.MOUSEMOTION:
                 mouse_pos = pygame.mouse.get_pos()
+                # Highlight squares with mouse hover :
                 if isOn(mouse_pos)[2] == 9: # Can put a tower (cursor on grass tile)
-                    pygame.draw.rect(surface, (255, 255, 255), (isOn(mouse_pos)[0]*32, isOn(mouse_pos)[1]*32, 31, 31), 1)
+                    squareX = isOn(mouse_pos)[0]*32
+                    squareY = isOn(mouse_pos)[1]*32
+                    pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
+                    canBuild = True
                 else:
                     pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0]*32, isOn(mouse_pos)[1]*32, 31, 31), 1)
+                    canBuild = False
 
 
-        # if map_generated == False:
-        #     for line in lines:
-        #         for c in line:
-        #             if c == '0': # wall (no tower allowed)
-        #                 surface.blit(img_wall, (32*jmap, 32*imap))
-        #             if c == '1': # START (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '2': # move (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '3': # turn up (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '4': # turn right (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '5': # turn down (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '6': # turn left (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '7': # END (path: no tower allowed)
-        #                 surface.blit(img_path, (32*jmap, 32*imap))
-        #             if c == '9': # grass (can put towers on it)
-        #                 surface.blit(img_grass, (32*jmap, 32*imap))
-        #             print(str(jmap) + " " + str(imap))
-        #             jmap += 1
-        #         jmap = 0
-        #         imap += 1
-        #     map_generated = True
-        # for monster in Monster.monster_list:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if canBuild:
+                    tower = Tower(squareX, squareY)
 
+                if btn_playPause.collidepoint(mouse_pos):
+                    paused = not paused
+                    if paused:
+                        playPause = play
+                        print("pause!")
+                    else:
+                        playPause = pause
+                        print("play!")
+
+
+        # Draw and update monsters :
         for monster in Monster.monster_list:
-            monster.move()
+            if paused == False:
+                monster.move()
             surface.blit(monster.image, (monster.posX, monster.posY))
+
+        # Draw towers :
+        for tower in Tower.tower_list:
+            surface.blit(tower.image, (tower.posX, tower.posY))
 
         pygame.display.update()
         clock.tick(60)

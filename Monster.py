@@ -37,11 +37,11 @@ class Monster():
     def getDirection(self):
         if self.isOn() == 3:
             self.direction = "up"
-        if self.isOn() == 4:
+        elif self.isOn() == 4:
             self.direction = "right"
-        if self.isOn() == 5:
+        elif self.isOn() == 5:
             self.direction = "down"
-        if self.isOn() == 6:
+        elif self.isOn() == 6:
             self.direction = "left"
         # if self.isOn() == 7: # End of path
             # Player.hp -= 1
