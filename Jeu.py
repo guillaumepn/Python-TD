@@ -4,6 +4,7 @@ import time
 from pygame.locals import *
 from Monster import *
 from Tower import *
+from Player import *
 from random import *
 
 print(sys.version)
@@ -39,6 +40,10 @@ lines = [x.strip() for x in lines]
 #     text = font.render("score : " + str(compte), True, white)
 #     surface.blit(text, (10, 10))
 
+def drawText(text, posX, posY, color=(255, 255, 255)):
+    font = pygame.font.Font('assets/fonts/ShareTech.ttf', 16)
+    text = font.render(str(text), True, color)
+    surface.blit(text, (posX, posY))
 
 def replayOrQuit():
     for event in pygame.event.get([pygame.KEYDOWN, pygame.KEYUP, pygame.QUIT]):
@@ -98,6 +103,8 @@ def main():
     pause = pygame.image.load('assets/pause.png').convert_alpha()
     playPause = play
     guipanel = pygame.image.load('assets/gui-panel.png').convert()
+    # The player :
+    player = Player(20, 100)
     # Towers :
     # tower01 = pygame.image.load('assets/tower01.png').convert_alpha()
 
@@ -124,6 +131,12 @@ def main():
         # GUI:
         surface.blit(guipanel, (800, 0))
         btn_playPause = surface.blit(playPause, (832, 32))
+        # Gold:
+        surface.blit(player.image_gold, (880, 48))
+        drawText(player.gold, 880, 24)
+        # Health:
+        surface.blit(player.image_health, (912, 48))
+        drawText(player.health, 916, 24)
 
         # Events and controls :
         for event in pygame.event.get():
@@ -144,8 +157,9 @@ def main():
 
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if canBuild:
+                if canBuild and player.gold >= 20:
                     tower = Tower(squareX, squareY)
+                    player.gold -= 20
 
                 if btn_playPause.collidepoint(mouse_pos):
                     paused = not paused
@@ -161,6 +175,8 @@ def main():
         for monster in Monster.monster_list:
             if paused == False:
                 monster.move()
+            if monster.direction == "end":
+                player.health -= 1
             surface.blit(monster.image, (monster.posX, monster.posY))
 
         # Draw towers :

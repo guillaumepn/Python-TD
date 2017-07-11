@@ -1,5 +1,5 @@
 import pygame
-import Player
+from Player import *
 
 class Monster():
     monster_count = 0
@@ -16,12 +16,8 @@ class Monster():
         Monster.monster_count += 1
         Monster.monster_list.append(self)
 
-    # def draw(self, surface):
-    #     surface.blit(self.image, (self.posX, self.posY))
-
     def move(self):
         self.getDirection()
-        # print(str(self.posY) + " " + self.direction)
         if self.direction == "right":
             self.posX += 1
 
@@ -43,16 +39,24 @@ class Monster():
             self.direction = "down"
         elif self.isOn() == 6:
             self.direction = "left"
-        # if self.isOn() == 7: # End of path
-            # Player.hp -= 1
-            # Monster.monster_list.remove(self)
+        elif self.isOn() == 7: # End of path
+            self.direction = "end"
+            Monster.monster_list.remove(self)
 
     def isOn(self):
         diffX = 0
         diffY = 0
+        if self.posX < 0:
+            x = 0
+        else:
+            x = self.posX
+        if self.posY < 0:
+            y = 0
+        else:
+            y = self.posY
+
         if self.direction == "left": diffX = 31
         if self.direction == "up": diffY = 31
-        i = int((self.posY + diffY) / 32)
-        j = int((self.posX + diffX) / 32)
-        # print(self.grid[i][j])
+        i = int((y + diffY) / 32)
+        j = int((x + diffX) / 32)
         return int(self.grid[i][j])

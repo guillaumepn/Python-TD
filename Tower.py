@@ -9,5 +9,6 @@ class Tower():
         self.type = type
         if self.type == 1:
             self.image = pygame.image.load('assets/tower01.png').convert_alpha()
+            self.cost = 20
         Tower.tower_count += 1
         Tower.tower_list.append(self)
