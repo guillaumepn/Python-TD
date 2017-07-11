@@ -88,6 +88,10 @@ def isOn(mouse_pos):
         i = int((mouse_pos[0]) / 32)
         j = int((mouse_pos[1]) / 32)
         type = int(lines[j][i])
+        # print("Cursor", i, j)
+    for tower in Tower.tower_list:
+        if int(tower.posX / 32) == i and int(tower.posY / 32) == j:
+            type = tower.type
     return (i, j, type)
 
 def main():
@@ -97,15 +101,16 @@ def main():
     play = pygame.image.load('assets/play.png').convert_alpha()
     pause = pygame.image.load('assets/pause.png').convert_alpha()
     playPause = play
-    guipanel = pygame.image.load('assets/gui-panel.png').convert()
     # Towers :
-    # tower01 = pygame.image.load('assets/tower01.png').convert_alpha()
+    tower01 = pygame.image.load('assets/tower01.png').convert_alpha()
+    tower02 = pygame.image.load('assets/tower02.png').convert_alpha()
 
+    guipanel = pygame.image.load('assets/gui-panel.png').convert()
     # Creation of snakes (appended to Monster.monster_list)
     for i in range(0, 5):
         snake = Monster(surface, 10, (-i * 20), 96, 'snake.png', lines)
 
-    surface.blit(background, (0, 0))
+    # surface.blit(background, (0, 0))
 
     imap = 0
     jmap = 0
@@ -114,6 +119,8 @@ def main():
     canBuild = False
     squareX = 0
     squareY = 0
+    towerType = 1
+
 
     game_over = False
     map_generated = False
@@ -125,6 +132,10 @@ def main():
         surface.blit(guipanel, (800, 0))
         btn_playPause = surface.blit(playPause, (832, 32))
 
+        # Towers:
+        btn_tower01 = surface.blit(tower01, (832, 96))
+        btn_tower02 = surface.blit(tower02, (864, 96))
+
         # Events and controls :
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -133,20 +144,23 @@ def main():
             if event.type == pygame.MOUSEMOTION:
                 mouse_pos = pygame.mouse.get_pos()
                 # Highlight squares with mouse hover :
+                squareX = isOn(mouse_pos)[0]*32
+                squareY = isOn(mouse_pos)[1]*32
                 if isOn(mouse_pos)[2] == 9: # Can put a tower (cursor on grass tile)
-                    squareX = isOn(mouse_pos)[0]*32
-                    squareY = isOn(mouse_pos)[1]*32
                     pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
                     canBuild = True
+                elif isOn(mouse_pos)[2] == 1: #Detect type of tower and get range #TODO NOT FINISHED
+                    pygame.draw.circle(surface, (255, 255, 255, 0), (squareX, squareY), 20, 20)
                 else:
                     pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0]*32, isOn(mouse_pos)[1]*32, 31, 31), 1)
                     canBuild = False
 
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if canBuild:
-                    tower = Tower(squareX, squareY)
 
+                if canBuild:
+                    tower = Tower(squareX, squareY, towerType)
+                    # mouse_pos[2] = towerType
                 if btn_playPause.collidepoint(mouse_pos):
                     paused = not paused
                     if paused:
@@ -156,6 +170,11 @@ def main():
                         playPause = pause
                         print("play!")
 
+                if btn_tower01.collidepoint(mouse_pos):
+                    towerType = 1
+
+                if btn_tower02.collidepoint(mouse_pos):
+                    towerType = 2
 
         # Draw and update monsters :
         for monster in Monster.monster_list:
