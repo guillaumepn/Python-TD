@@ -10,11 +10,15 @@ class Tower():
         self.range = range
         if self.type == 1:
             self.image = pygame.image.load('assets/tower01.png').convert_alpha()
-            self.cost = 20
+            self.range = 80
 
         if self.type == 2:
             self.image = pygame.image.load('assets/tower02.png').convert_alpha()
-            self.cost = 20
+            self.range = 100
+
+        if self.type == 3:
+            self.image = pygame.image.load('assets/tower03.png').convert_alpha()
+            self.range = 50
 
         Tower.tower_count += 1
         Tower.tower_list.append(self)
