@@ -127,13 +127,10 @@ def main():
 
     guipanel = pygame.image.load('assets/gui-panel.png').convert()
     # Creation of snakes (appended to Monster.monster_list)
-    for i in range(0, 5):
-        snake = Monster(surface, 10, (-i * 20), 96, 'snake.png', lines)
+    for i in range(0, 50):
+        Monster(surface, 10, (-i * 20), 96, 'snake.png', lines)
 
-    # surface.blit(background, (0, 0))
 
-    imap = 0
-    jmap = 0
     mouse_pos = 0
     paused = True
     canBuild = False
@@ -141,11 +138,8 @@ def main():
     squareY = 0
     towerType = 0
     towerCost = 0
-    towerRange = 0
-
 
     game_over = False
-    map_generated = False
 
     while not game_over:
         surface.blit(background, (0, 0))
@@ -175,6 +169,8 @@ def main():
         # Info
         surface.blit(info_panel, (832, 192))
 
+        if player.health < 1:
+            game_over = True
 
         # Events and controls :
         for event in pygame.event.get():
@@ -186,24 +182,6 @@ def main():
                 # Highlight squares with mouse hover :
                 squareX = isOn(mouse_pos)[0]*32
                 squareY = isOn(mouse_pos)[1]*32
-
-                if isOn(mouse_pos)[2] == 9: # Can put a tower (cursor on grass tile)
-                    pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
-                    canBuild = True
-
-                    if towerType == 1:
-                        surface.blit(range01, (squareX + 16 - 80, squareY + 16 - 80))
-                        surface.blit(tower01, (squareX, squareY))
-                    if towerType == 2:
-                        surface.blit(range02, (squareX + 16 - 100, squareY + 16 - 100))
-                        surface.blit(tower02, (squareX, squareY))
-                    if towerType == 3:
-                        surface.blit(range03, (squareX + 16 - 50, squareY + 16 - 50))
-                        surface.blit(tower03, (squareX, squareY))
-
-                else:
-                    pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0]*32, isOn(mouse_pos)[1]*32, 31, 31), 1)
-                    canBuild = False
 
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -248,23 +226,57 @@ def main():
             drawText("enemies down.", 836, 224, 10)
             drawText("Gold : 30", 836, 234, 10, (255, 193, 7))
 
+        if isOn(mouse_pos)[2] == 9:  # Can put a tower (cursor on grass tile)
+            pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
+            canBuild = True
+
+            if towerType == 1:
+                surface.blit(range01, (squareX + 16 - 80, squareY + 16 - 80))
+                surface.blit(tower01, (squareX, squareY))
+            if towerType == 2:
+                surface.blit(range02, (squareX + 16 - 100, squareY + 16 - 100))
+                surface.blit(tower02, (squareX, squareY))
+            if towerType == 3:
+                surface.blit(range03, (squareX + 16 - 50, squareY + 16 - 50))
+                surface.blit(tower03, (squareX, squareY))
+
+        else:
+            pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0] * 32, isOn(mouse_pos)[1] * 32, 31, 31), 1)
+            canBuild = False
+
         # Draw and update monsters :
         for monster in Monster.monster_list:
+            if monster.health < 1:
+                Monster.monster_list.remove(monster)
             if paused == False:
                 monster.move()
             if monster.direction == "end":
                 player.health -= 1
             surface.blit(monster.image, (monster.posX, monster.posY))
+            drawText(str(monster.health), monster.posX+28, monster.posY-4, 10)    # FOR DEBUGGING ONLY
 
         # Draw towers :
         for tower in Tower.tower_list:
             surface.blit(tower.image, (tower.posX, tower.posY))
             if tower.type == 1:
-                surface.blit(range01, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
+                tower_range = surface.blit(range01, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
             if tower.type == 2:
-                surface.blit(range02, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
+                tower_range = surface.blit(range02, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
             if tower.type == 3:
-                surface.blit(range03, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
+                tower_range = surface.blit(range03, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
+            for monster in Monster.monster_list:
+                if tower_range.collidepoint((monster.posX, monster.posY)):
+                    if tower.target == None:
+                        tower.target = monster
+                    if tower.target == monster:
+                        tower.shoot(monster.posX, monster.posY)
+                        print("shoot!")
+                if tower.target == monster and not tower_range.collidepoint((monster.posX, monster.posY)):
+                    tower.target = None
+
+        # Draw bullets :
+        for bullet in Bullet.bullet_list:
+            surface.blit(bullet.image, (bullet.posX, bullet.posY))
 
         pygame.display.update()
         clock.tick(60)

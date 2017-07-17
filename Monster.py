@@ -5,9 +5,9 @@ class Monster():
     monster_count = 0
     monster_list = []
 
-    def __init__(self, surface, hp, posX, posY, image, grid):
+    def __init__(self, surface, health, posX, posY, image, grid):
         self.surface = surface
-        self.hp = hp
+        self.health = health
         self.posX = posX
         self.posY = posY
         self.direction = "right"

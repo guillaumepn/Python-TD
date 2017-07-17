@@ -24,6 +24,6 @@ fpsController = pygame.time.Clock()
 
 #TO DELET
 snakePos = [100, 50]
-snakeBody = [[100,50][90,50][80,5koreus0]]
+# snakeBody = [[100,50][90,50][80,5koreus0]]
 
 time.sleep(5)
