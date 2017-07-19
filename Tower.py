@@ -12,33 +12,37 @@ class Tower():
         self.range = range
         self.target = None
         self.bullet_shot = False
+        self.counter = 1
         if self.type == 1:
             self.image = pygame.image.load('assets/tower01.png').convert_alpha()
             self.range = 80
             self.damage = 1
+            self.interval = 0.2 * 60
             self.bullet_image = pygame.image.load('assets/bullet01.png').convert_alpha()
 
         if self.type == 2:
             self.image = pygame.image.load('assets/tower02.png').convert_alpha()
             self.range = 100
             self.damage = 3
+            self.interval = 1.0 * 60
             self.bullet_image = pygame.image.load('assets/bullet02.png').convert_alpha()
 
         if self.type == 3:
             self.image = pygame.image.load('assets/tower03.png').convert_alpha()
             self.range = 50
             self.damage = 2
+            self.interval = 0.7 * 60
             self.bullet_image = pygame.image.load('assets/bullet03.png').convert_alpha()
 
         Tower.tower_count += 1
         Tower.tower_list.append(self)
 
     def shoot(self, destX, destY):
-        if not self.bullet_shot:
-            print("bullet shot!")
-            bullet = Bullet(self.posX, self.posY, destX, destY, self.bullet_image)
+        if self.counter % self.interval == 0:
+            print("bullet shot!" + str(self.counter) + " " + str(self.interval))
+            bullet = Bullet(self, self.target, self.bullet_image)
             self.bullet_shot = True
             bullet.move()
-            print("bullet arrived")
-            self.target.health -= self.damage
-            self.bullet_shot = False
+            self.counter = 1
+        else:
+            self.counter += 1

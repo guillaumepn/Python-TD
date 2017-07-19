@@ -126,8 +126,9 @@ def main():
     range03 = pygame.image.load('assets/range03.png').convert_alpha()
 
     guipanel = pygame.image.load('assets/gui-panel.png').convert()
+
     # Creation of snakes (appended to Monster.monster_list)
-    for i in range(0, 50):
+    for i in range(0, 20):
         Monster(surface, 10, (-i * 20), 96, 'snake.png', lines)
 
 
@@ -248,7 +249,8 @@ def main():
         for monster in Monster.monster_list:
             if monster.health < 1:
                 Monster.monster_list.remove(monster)
-            if paused == False:
+                player.gold += 5
+            if not paused:
                 monster.move()
             if monster.direction == "end":
                 player.health -= 1
@@ -266,12 +268,12 @@ def main():
                 tower_range = surface.blit(range03, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
             for monster in Monster.monster_list:
                 if tower_range.collidepoint((monster.posX, monster.posY)):
-                    if tower.target == None:
+                    if tower.target is None:
                         tower.target = monster
-                    if tower.target == monster:
+                    if tower.target == monster and not tower.bullet_shot:
                         tower.shoot(monster.posX, monster.posY)
                         print("shoot!")
-                if tower.target == monster and not tower_range.collidepoint((monster.posX, monster.posY)):
+                if tower.target == monster and (not tower_range.collidepoint((monster.posX, monster.posY)) or monster.health < 1):
                     tower.target = None
 
         # Draw bullets :
