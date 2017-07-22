@@ -48,7 +48,8 @@ class Bullet():
             t.start()
         # Else, it reached target !
         else:
-            self.tower.target.health -= self.tower.damage
+            if self.tower.target is not None:
+                self.tower.target.health -= self.tower.damage
             self.tower.bullet_shot = False
             print("bullet arrived")
             Bullet.bullet_list.remove(self)

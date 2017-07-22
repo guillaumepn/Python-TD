@@ -190,6 +190,7 @@ def main():
 
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Build tower TODO cannot build tower on tower
                 if canBuild and towerType != 0 and player.gold >= towerCost:
                     player.gold -= towerCost
                     tower = Tower(squareX, squareY, towerType)
