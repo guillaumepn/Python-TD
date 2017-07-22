@@ -23,7 +23,7 @@ class Tower():
         if self.type == 2:
             self.image = pygame.image.load('assets/tower02.png').convert_alpha()
             self.range = 100
-            self.damage = 3
+            self.damage = 4
             self.interval = 1.0 * 60
             self.bullet_image = pygame.image.load('assets/bullet02.png').convert_alpha()
 

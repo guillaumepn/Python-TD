@@ -112,7 +112,7 @@ def main():
     tower_panel = pygame.image.load('assets/tower-panel.png').convert()                     # Tower background panel
     tower_panel_select = pygame.image.load('assets/tower-panel-select.png').convert()       # Tower background panel
     info_panel = pygame.image.load('assets/info-panel.png').convert_alpha()                 # Info panel
-
+    nextlevel_panel = pygame.image.load('assets/nextlevel-panel.png').convert_alpha()       # Next Level panel
 
     # The player :
     player = Player(20, 100)
@@ -125,11 +125,15 @@ def main():
     tower03 = pygame.image.load('assets/tower03.png').convert_alpha()   # Ice
     range03 = pygame.image.load('assets/range03.png').convert_alpha()
 
+    # Sounds :
+    select = pygame.mixer.Sound('assets/sounds/select.wav')
+    hurt = pygame.mixer.Sound('assets/sounds/hurt.wav')
+
     guipanel = pygame.image.load('assets/gui-panel.png').convert()
 
     # Creation of snakes (appended to Monster.monster_list)
     for i in range(0, 20):
-        Monster(surface, 10, (-i * 20), 96, 'snake.png', lines)
+        Monster(surface, 8, (-i * 20), 96, 'snake.png', lines)
 
 
     mouse_pos = 0
@@ -200,14 +204,17 @@ def main():
                         print("play!")
 
                 if btn_tower01.collidepoint(mouse_pos):
+                    select.play()
                     towerType = 1
                     towerCost = 20
 
                 if btn_tower02.collidepoint(mouse_pos):
+                    select.play()
                     towerType = 2
                     towerCost = 25
 
                 if btn_tower03.collidepoint(mouse_pos):
+                    select.play()
                     towerType = 3
                     towerCost = 30
 
@@ -254,6 +261,7 @@ def main():
                 monster.move()
             if monster.direction == "end":
                 player.health -= 1
+                hurt.play()
             surface.blit(monster.image, (monster.posX, monster.posY))
             drawText(str(monster.health), monster.posX+28, monster.posY-4, 10)    # FOR DEBUGGING ONLY
 
@@ -266,8 +274,11 @@ def main():
                 tower_range = surface.blit(range02, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
             if tower.type == 3:
                 tower_range = surface.blit(range03, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
+            if tower.target is not None and tower.target.health < 1:
+                tower.target = None
+
             for monster in Monster.monster_list:
-                if tower_range.collidepoint((monster.posX, monster.posY)):
+                if tower_range.collidepoint((monster.posX, monster.posY)) and not paused:
                     if tower.target is None:
                         tower.target = monster
                     if tower.target == monster and not tower.bullet_shot:
@@ -279,6 +290,12 @@ def main():
         # Draw bullets :
         for bullet in Bullet.bullet_list:
             surface.blit(bullet.image, (bullet.posX, bullet.posY))
+
+        # If enemy list is empty : victory !
+        if not Monster.monster_list and player.health > 0:
+            drawText("VICTORY!", 300, 300, 40)
+            surface.blit(nextlevel_panel, (832, 256))
+            drawText("GO NEXT LEVEL", 840, 282, 12, (255, 193, 7))
 
         pygame.display.update()
         clock.tick(60)
