@@ -36,6 +36,11 @@ with open('assets/map01.txt') as file:
 
 lines = [x.strip() for x in lines]
 
+with open('assets/map02.txt') as file:
+    lines2 = file.readlines()
+
+lines2 = [x.strip() for x in lines2]
+
 # def score(compte):
 #     font = pygame.font.Font('BradBunR.ttf', 16)
 #     text = font.render("score : " + str(compte), True, white)
@@ -70,10 +75,20 @@ def isOn(mouse_pos):
             tower_type = int(tower.type)
     return (i, j, type, tower_type)
 
+def loadMonsters(lvl):
+    if lvl == 1:
+        for i in range(0, 20):
+            Monster(surface, 8, (-i * 20), 96, 'snake.png', lines)
+    if lvl == 2:
+        for i in range(0, 30):
+            Monster(surface, 9, 160, 600+(i * 20), 'assets/skeleton.png', lines2)
+
+
 def main():
     # welcomeMenu
     welcomeMenu = pygame.image.load('assets/welcomeMenu.png').convert()
 
+    lvl = 1
 
     # Background :
     background = pygame.image.load('assets/map01.png').convert()
@@ -106,9 +121,9 @@ def main():
     guipanel = pygame.image.load('assets/gui-panel.png').convert()
 
     # Creation of snakes (appended to Monster.monster_list)
-    for i in range(0, 20):
-        Monster(surface, 8, (-i * 20), 96, 'snake.png', lines)
-
+    monstersLoaded = False
+    if lvl == 1:
+        loadMonsters(1)
 
     mouse_pos = 0
     paused = True
@@ -257,6 +272,14 @@ def main():
                         towerType = 3
                         towerCost = 30
 
+                    if 'nextlevel_btn' in locals():
+                        if nextlevel_btn.collidepoint(mouse_pos):
+                            background = pygame.image.load('assets/map02.png').convert()
+                            del Monster.monster_list[:]
+                            del Tower.tower_list[:]
+                            del Bullet.bullet_list[:]
+                            loadMonsters(2)
+
             if towerType == 1:
                 surface.blit(tower01, (896, 160))
                 drawText("Fast and small", 836, 214, 10)
@@ -331,7 +354,7 @@ def main():
             # If enemy list is empty : victory !
             if not Monster.monster_list and player.health > 0:
                 drawText("VICTORY!", 300, 300, 40)
-                surface.blit(nextlevel_panel, (832, 256))
+                nextlevel_btn = surface.blit(nextlevel_panel, (832, 256))
                 drawText("GO NEXT LEVEL", 840, 282, 12, (255, 193, 7))
 
             pygame.display.update()
