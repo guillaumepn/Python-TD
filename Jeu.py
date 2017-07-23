@@ -81,7 +81,7 @@ def loadMonsters(lvl):
             Monster(surface, 8, (-i * 20), 96, 'snake.png', lines)
     if lvl == 2:
         for i in range(0, 30):
-            Monster(surface, 9, 160, 600+(i * 20), 'assets/skeleton.png', lines2)
+            Monster(surface, 8, (-i * 20), 544, 'assets/skeleton.png', lines2)
 
 
 def main():
