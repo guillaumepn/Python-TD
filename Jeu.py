@@ -201,8 +201,8 @@ def main():
             if(selectedTower != False):
                 surface.blit(player.image_gold, (805, 525))
                 drawText(int(round(selectedTower.totalCost * 0.8)), 830, 525, 20, (0,0,0))
-                btn_sell = pygame.draw.rect(surface, (255, 255, 255), (860,520,65,20))
-                drawText("Vendre", 860, 520, 20, (0,0,0))
+                btn_sell = pygame.draw.rect(surface, (255, 255, 255), (860,520,45,20))
+                drawText("Sell", 860, 520, 20, (0,0,0))
 
             if player.health < 1:
                 game_over = True
