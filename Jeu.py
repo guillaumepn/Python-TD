@@ -121,14 +121,13 @@ def main():
 
     game_over = False
     game_started = False
-    i = 0
 
     while not game_started:
         surface.blit(welcomeMenu, (0,0))
-        play =  pygame.draw.rect(surface, (255, 255, 255), (370,450,70,30))
+        startBtn =  pygame.draw.rect(surface, (255, 255, 255), (370,450,70,30))
         drawText("Jouer", 370, 450, 25, (0,0,0))
 
-        quite =  pygame.draw.rect(surface, (255, 255, 255), (520,450,100,30))
+        quitBtn =  pygame.draw.rect(surface, (255, 255, 255), (520,450,100,30))
         drawText("Quitter", 520, 450, 25, (0,0,0))
 
         drawText("Par Guillaume Pham Ngoc et Maël Mayon", 10, 610)
@@ -143,9 +142,9 @@ def main():
                 mouse_pos = pygame.mouse.get_pos()
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if play.collidepoint(mouse_pos):
+                if startBtn.collidepoint(mouse_pos):
                     game_started = True
-                if quite.collidepoint(mouse_pos):
+                if quitBtn.collidepoint(mouse_pos):
                     sys.exit()
 
         pygame.display.update()
