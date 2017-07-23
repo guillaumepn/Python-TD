@@ -65,7 +65,6 @@ def isOn(mouse_pos):
         i = int((mouse_pos[0]) / 32)
         j = int((mouse_pos[1]) / 32)
         type = int(lines[j][i])
-        # print("Cursor", i, j)
     for tower in Tower.tower_list:
         if int(tower.posX / 32) == i and int(tower.posY / 32) == j:
             tower_type = int(tower.type)
@@ -118,22 +117,21 @@ def main():
     squareY = 0
     towerType = 0
     towerCost = 0
+    selectedTower = False
 
     game_over = False
     game_started = False
-    i = 0
 
     while not game_started:
         surface.blit(welcomeMenu, (0,0))
-        play =  pygame.draw.rect(surface, (255, 255, 255), (370,450,70,30))
+        startBtn =  pygame.draw.rect(surface, (255, 255, 255), (370,450,70,30))
         drawText("Jouer", 370, 450, 25, (0,0,0))
 
-        quite =  pygame.draw.rect(surface, (255, 255, 255), (520,450,100,30))
+        quitBtn =  pygame.draw.rect(surface, (255, 255, 255), (520,450,100,30))
         drawText("Quitter", 520, 450, 25, (0,0,0))
 
         drawText("Par Guillaume Pham Ngoc et Maël Mayon", 10, 610)
         drawText("3IW1", 910, 610)
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -143,16 +141,15 @@ def main():
                 mouse_pos = pygame.mouse.get_pos()
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if play.collidepoint(mouse_pos):
+                if startBtn.collidepoint(mouse_pos):
                     game_started = True
-                if quite.collidepoint(mouse_pos):
+                if quitBtn.collidepoint(mouse_pos):
                     sys.exit()
 
         pygame.display.update()
     if game_started:
         while not game_over:
             surface.blit(background, (0, 0))
-
             # GUI:
             surface.blit(guipanel, (800, 0))
             btn_playPause = surface.blit(playPause, (832, 32))
@@ -177,6 +174,20 @@ def main():
             surface.blit(tower_panel_select, (896, 160))
             # Info
             surface.blit(info_panel, (832, 192))
+            #Upgrade
+            btn_upgrade = pygame.draw.rect(surface, (255, 255, 255), (0,0,0,0))
+            if(selectedTower != False):
+                surface.blit(player.image_gold, (805, 455))
+                drawText(int(round(selectedTower.cost)), 830, 450, 20, (0,0,0))
+                btn_upgrade = pygame.draw.rect(surface, (255, 255, 255), (860,450,78,20))
+                drawText("Upgrade", 860, 450, 20, (0,0,0))
+            #Sell
+            btn_sell = pygame.draw.rect(surface, (255, 255, 255), (0,0,0,0))
+            if(selectedTower != False):
+                surface.blit(player.image_gold, (805, 525))
+                drawText(int(round(selectedTower.totalCost * 0.8)), 830, 525, 20, (0,0,0))
+                btn_sell = pygame.draw.rect(surface, (255, 255, 255), (860,520,65,20))
+                drawText("Vendre", 860, 520, 20, (0,0,0))
 
             if player.health < 1:
                 game_over = True
@@ -194,8 +205,31 @@ def main():
 
 
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    # Build tower TODO cannot build tower on tower
-                    if canBuild and towerType != 0 and player.gold >= towerCost:
+                    #if click on Upgrade
+                    if btn_upgrade.collidepoint(mouse_pos) and player.gold >= selectedTower.cost:
+                        player.gold -= selectedTower.cost;
+                        selectedTower.cost = selectedTower.cost * 1.5
+                        selectedTower.damage = selectedTower.damage * 1.1
+                        selectedTower.totalCost += selectedTower.cost
+                    #If click on sell
+                    if btn_sell.collidepoint(mouse_pos):
+                        player.gold += int(round(selectedTower.totalCost * 0.8));
+                        Tower.tower_list.remove(selectedTower)
+                    #If click on tower
+                    selectedTower = False
+                    if isOn(mouse_pos)[3] != 0:
+                        i = int((mouse_pos[0]) / 32)
+                        j = int((mouse_pos[1]) / 32)
+                        for tower in Tower.tower_list:
+                            if int(tower.posX / 32) == i and int(tower.posY / 32) == j:
+                                selectedTower = tower
+                                towerCost = tower.cost #Si l'on affiche qlq part
+
+                                print("Cost : ", tower.cost)
+                                print("Dmg : ", tower.damage)
+
+                    #Build tower
+                    if canBuild and towerType != 0 and player.gold >= towerCost and isOn(mouse_pos)[3] == 0:
                         player.gold -= towerCost
                         tower = Tower(squareX, squareY, towerType)
 
@@ -232,7 +266,7 @@ def main():
                 surface.blit(tower02, (896, 160))
                 drawText("Slow and strong", 836, 214, 10)
                 drawText("damages.", 836, 224, 10)
-                drawText("Gold : 25", 836, 234, 10, (255, 193, 7))
+                drawText(("Gold : 25",), 836, 234, 10, (255, 193, 7))
             if towerType == 3:
                 surface.blit(tower03, (896, 160))
                 drawText("Ice tower : slows", 836, 214, 10)
@@ -240,9 +274,8 @@ def main():
                 drawText("Gold : 30", 836, 234, 10, (255, 193, 7))
 
             if isOn(mouse_pos)[2] == 9:  # Can put a tower (cursor on grass tile)
-                pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
                 canBuild = True
-
+                pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
                 if towerType == 1:
                     surface.blit(range01, (squareX + 16 - 80, squareY + 16 - 80))
                     surface.blit(tower01, (squareX, squareY))
@@ -252,7 +285,6 @@ def main():
                 if towerType == 3:
                     surface.blit(range03, (squareX + 16 - 50, squareY + 16 - 50))
                     surface.blit(tower03, (squareX, squareY))
-
             else:
                 pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0] * 32, isOn(mouse_pos)[1] * 32, 31, 31), 1)
                 canBuild = False
@@ -272,6 +304,7 @@ def main():
 
             # Draw towers :
             for tower in Tower.tower_list:
+
                 surface.blit(tower.image, (tower.posX, tower.posY))
                 if tower.type == 1:
                     tower_range = surface.blit(range01, (tower.posX + 16 - tower.range, tower.posY + 16 - tower.range))
@@ -288,7 +321,6 @@ def main():
                             tower.target = monster
                         if tower.target == monster and not tower.bullet_shot:
                             tower.shoot(monster.posX, monster.posY)
-                            # print("shoot!")
                     if tower.target == monster and (not tower_range.collidepoint((monster.posX, monster.posY)) or monster.health < 1):
                         tower.target = None
 
