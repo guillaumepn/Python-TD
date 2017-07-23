@@ -10,11 +10,15 @@ class Tower():
         self.posY = posY
         self.type = type
         self.range = range
+        self.cost = 0
+        self.totalCost = 0
         self.target = None
         self.bullet_shot = False
         self.counter = 1
         if self.type == 1:
             self.image = pygame.image.load('assets/tower01.png').convert_alpha()
+            self.cost = 20
+            self.totalCost = 20
             self.range = 80
             self.damage = 1
             self.interval = 0.2 * 60
@@ -22,6 +26,8 @@ class Tower():
 
         if self.type == 2:
             self.image = pygame.image.load('assets/tower02.png').convert_alpha()
+            self.cost = 25
+            self.totalCost = 25
             self.range = 100
             self.damage = 4
             self.interval = 1.0 * 60
@@ -29,6 +35,8 @@ class Tower():
 
         if self.type == 3:
             self.image = pygame.image.load('assets/tower03.png').convert_alpha()
+            self.cost = 30
+            self.totalCost = 30
             self.range = 50
             self.damage = 2
             self.interval = 0.7 * 60
