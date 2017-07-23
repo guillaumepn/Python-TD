@@ -52,6 +52,8 @@ class Monster():
             x = self.posX
         if self.posY < 0:
             y = 0
+        elif self.posY > 640:
+            y = 600
         else:
             y = self.posY
 
