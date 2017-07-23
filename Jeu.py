@@ -282,6 +282,7 @@ def main():
                             del Tower.tower_list[:]
                             del Bullet.bullet_list[:]
                             loadMonsters(2)
+                            lines = lines2
 
             if towerType == 1:
                 surface.blit(tower01, (896, 160))
