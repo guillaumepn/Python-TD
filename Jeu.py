@@ -155,7 +155,7 @@ def main():
             btn_playPause = surface.blit(playPause, (832, 32))
             # Gold:
             surface.blit(player.image_gold, (880, 48))
-            drawText(player.gold, 880, 24)
+            drawText(int(player.gold), 880, 24)
             # Health:
             surface.blit(player.image_health, (912, 48))
             drawText(player.health, 916, 24)
@@ -216,7 +216,6 @@ def main():
                         player.gold += int(round(selectedTower.totalCost * 0.8));
                         Tower.tower_list.remove(selectedTower)
                     #If click on tower
-                    selectedTower = False
                     if isOn(mouse_pos)[3] != 0:
                         i = int((mouse_pos[0]) / 32)
                         j = int((mouse_pos[1]) / 32)
@@ -232,6 +231,7 @@ def main():
                     if canBuild and towerType != 0 and player.gold >= towerCost and isOn(mouse_pos)[3] == 0:
                         player.gold -= towerCost
                         tower = Tower(squareX, squareY, towerType)
+                        selectedTower = False
 
                     if btn_playPause.collidepoint(mouse_pos):
                         paused = not paused
@@ -244,16 +244,19 @@ def main():
 
                     if btn_tower01.collidepoint(mouse_pos):
                         select.play()
+                        selectedTower = False
                         towerType = 1
                         towerCost = 20
 
                     if btn_tower02.collidepoint(mouse_pos):
                         select.play()
+                        selectedTower = False
                         towerType = 2
                         towerCost = 25
 
                     if btn_tower03.collidepoint(mouse_pos):
                         select.play()
+                        selectedTower = False
                         towerType = 3
                         towerCost = 30
 
@@ -266,7 +269,7 @@ def main():
                 surface.blit(tower02, (896, 160))
                 drawText("Slow and strong", 836, 214, 10)
                 drawText("damages.", 836, 224, 10)
-                drawText(("Gold : 25",), 836, 234, 10, (255, 193, 7))
+                drawText("Gold : 25", 836, 234, 10, (255, 193, 7))
             if towerType == 3:
                 surface.blit(tower03, (896, 160))
                 drawText("Ice tower : slows", 836, 214, 10)
