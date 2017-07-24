@@ -14,7 +14,7 @@ pygame.init()
 
 SCR_WIDTH = 960
 SCR_HEIGHT = 640
-
+lvl = 0
 # Creation of the window
 surface = pygame.display.set_mode(
     (SCR_WIDTH, SCR_HEIGHT),
@@ -30,16 +30,16 @@ clock = pygame.time.Clock()
 # img_grass = pygame.image.load('grass.png').convert()
 # img_path = pygame.image.load('path.png').convert()
 
-# Read through map text file to draw the map
-with open('assets/map01.txt') as file:
-    lines = file.readlines()
-
-lines = [x.strip() for x in lines]
-
-with open('assets/map02.txt') as file:
-    lines2 = file.readlines()
-
-lines2 = [x.strip() for x in lines2]
+def readLines(lvl):
+    if lvl == 1:
+        # Read through map text file to draw the map
+        with open('assets/map01.txt') as file:
+            lines = file.readlines()
+        lines = [x.strip() for x in lines]
+    if lvl == 2:
+        with open('assets/map02.txt') as file:
+            lines = file.readlines()
+        lines = [x.strip() for x in lines2]
 
 # def score(compte):
 #     font = pygame.font.Font('BradBunR.ttf', 16)
@@ -81,14 +81,23 @@ def loadMonsters(lvl):
             Monster(surface, 8, (-i * 20), 96, 'snake.png', lines)
     if lvl == 2:
         for i in range(0, 30):
-            Monster(surface, 8, (-i * 20), 544, 'assets/skeleton.png', lines2)
+            Monster(surface, 8, (-i * 20), 544, 'assets/skeleton.png', lines)
 
+def nextLevel():
+    global lvl
+    lvl += 1
+    del Monster.monster_list[:]
+    del Tower.tower_list[:]
+    del Bullet.bullet_list[:]
+    print(lvl)
+    readLines(lvl)
+    loadMonsters(lvl)
+    if lvl == 2:
+        background = pygame.image.load('assets/map02.png').convert()
 
 def main():
     # welcomeMenu
     welcomeMenu = pygame.image.load('assets/welcomeMenu.png').convert()
-
-    lvl = 1
 
     # Background :
     background = pygame.image.load('assets/map01.png').convert()
@@ -122,8 +131,6 @@ def main():
 
     # Creation of snakes (appended to Monster.monster_list)
     monstersLoaded = False
-    if lvl == 1:
-        loadMonsters(1)
 
     mouse_pos = 0
     paused = True
@@ -136,6 +143,8 @@ def main():
 
     game_over = False
     game_started = False
+
+    nextLevel()
 
     while not game_started:
         surface.blit(welcomeMenu, (0,0))
@@ -277,11 +286,7 @@ def main():
 
                     if 'nextlevel_btn' in locals():
                         if nextlevel_btn.collidepoint(mouse_pos):
-                            background = pygame.image.load('assets/map02.png').convert()
-                            del Monster.monster_list[:]
-                            del Tower.tower_list[:]
-                            del Bullet.bullet_list[:]
-                            loadMonsters(2)
+                            nextLevel()
 
             if towerType == 1:
                 surface.blit(tower01, (896, 160))
