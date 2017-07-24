@@ -78,7 +78,7 @@ def isOn(mouse_pos):
 def loadMonsters(lvl):
     if lvl == 1:
         for i in range(0, 20):
-            Monster(surface, 8, (-i * 20), 96, 'snake.png', lines)
+            Monster(surface, 8, (-i * 20), 96, 'assets/snake.png', lines)
     if lvl == 2:
         for i in range(0, 30):
             Monster(surface, 8, (-i * 20), 544, 'assets/skeleton.png', lines2)
@@ -230,6 +230,7 @@ def main():
                     if btn_sell.collidepoint(mouse_pos):
                         player.gold += int(round(selectedTower.totalCost * 0.8));
                         Tower.tower_list.remove(selectedTower)
+                        selectedTower = False
                     #If click on tower
                     if isOn(mouse_pos)[3] != 0:
                         i = int((mouse_pos[0]) / 32)
