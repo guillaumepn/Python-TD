@@ -26,42 +26,23 @@ surface.fill((255, 255, 255))
 pygame.display.set_caption("Python TD")
 clock = pygame.time.Clock()
 
-# img_wall = pygame.image.load('wall.png').convert()
-# img_grass = pygame.image.load('grass.png').convert()
-# img_path = pygame.image.load('path.png').convert()
-
-# Read through map text file to draw the map
-with open('assets/map01.txt') as file:
-    lines = file.readlines()
-
-lines = [x.strip() for x in lines]
-
-with open('assets/map02.txt') as file:
-    lines2 = file.readlines()
-
-lines2 = [x.strip() for x in lines2]
-
-# def score(compte):
-#     font = pygame.font.Font('BradBunR.ttf', 16)
-#     text = font.render("score : " + str(compte), True, white)
-#     surface.blit(text, (10, 10))
+# # Read through map text file to draw the map
+# with open('assets/map01.txt') as file:
+#     lines = file.readlines()
+#
+# lines = [x.strip() for x in lines]
+#
+# with open('assets/map02.txt') as file2:
+#     lines2 = file2.readlines()
+#
+# lines2 = [x.strip() for x in lines2]
 
 def drawText(text, posX, posY, size=16, color=(255, 255, 255)):
     font = pygame.font.Font('assets/fonts/ShareTech.ttf', size)
     text = font.render(str(text), True, color)
     surface.blit(text, (posX, posY))
 
-def replayOrQuit():
-    for event in pygame.event.get([pygame.KEYDOWN, pygame.KEYUP, pygame.QUIT]):
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        elif event.type == pygame.KEYUP:
-            continue
-        return event.key
-    return None
-
-def isOn(mouse_pos):
+def isOn(mouse_pos, lines):
     i = 0
     j = 0
     type = 0
@@ -77,16 +58,38 @@ def isOn(mouse_pos):
 
 def loadMonsters(lvl):
     if lvl == 1:
+        with open('assets/map01.txt') as file:
+            lines = file.readlines()
+        lines = [x.strip() for x in lines]
         for i in range(0, 20):
             Monster(surface, 8, (-i * 20), 96, 'assets/snake.png', lines)
     if lvl == 2:
+        with open('assets/map02.txt') as file:
+            lines = file.readlines()
+        lines = [x.strip() for x in lines]
         for i in range(0, 30):
-            Monster(surface, 8, (-i * 20), 544, 'assets/skeleton.png', lines2)
+            Monster(surface, 8, (-i * 20), 544, 'assets/skeleton.png', lines)
 
 
 def main():
+    # Read through map text file to draw the map
+    with open('assets/map01.txt') as file:
+        lines = file.readlines()
+
+    lines = [x.strip() for x in lines]
+
+    with open('assets/map02.txt') as file2:
+        lines2 = file2.readlines()
+
+    lines2 = [x.strip() for x in lines2]
     # welcomeMenu
     welcomeMenu = pygame.image.load('assets/welcomeMenu.png').convert()
+
+
+    for i in lines:
+        for j in i:
+            print(j)
+        print("\n")
 
     lvl = 1
 
@@ -215,24 +218,24 @@ def main():
                 if event.type == pygame.MOUSEMOTION:
                     mouse_pos = pygame.mouse.get_pos()
                     # Highlight squares with mouse hover :
-                    squareX = isOn(mouse_pos)[0]*32
-                    squareY = isOn(mouse_pos)[1]*32
+                    squareX = isOn(mouse_pos, lines)[0]*32
+                    squareY = isOn(mouse_pos, lines)[1]*32
 
 
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     #if click on Upgrade
                     if btn_upgrade.collidepoint(mouse_pos) and player.gold >= selectedTower.cost:
-                        player.gold -= selectedTower.cost;
+                        player.gold -= selectedTower.cost
                         selectedTower.cost = selectedTower.cost * 1.5
                         selectedTower.damage = selectedTower.damage * 1.1
                         selectedTower.totalCost += selectedTower.cost
                     #If click on sell
                     if btn_sell.collidepoint(mouse_pos):
-                        player.gold += int(round(selectedTower.totalCost * 0.8));
+                        player.gold += int(round(selectedTower.totalCost * 0.8))
                         Tower.tower_list.remove(selectedTower)
                         selectedTower = False
                     #If click on tower
-                    if isOn(mouse_pos)[3] != 0:
+                    if isOn(mouse_pos, lines)[3] != 0:
                         i = int((mouse_pos[0]) / 32)
                         j = int((mouse_pos[1]) / 32)
                         for tower in Tower.tower_list:
@@ -244,7 +247,7 @@ def main():
                                 print("Dmg : ", tower.damage)
 
                     #Build tower
-                    if canBuild and towerType != 0 and player.gold >= towerCost and isOn(mouse_pos)[3] == 0:
+                    if canBuild and towerType != 0 and player.gold >= towerCost and isOn(mouse_pos, lines)[3] == 0:
                         player.gold -= towerCost
                         tower = Tower(squareX, squareY, towerType)
                         selectedTower = False
@@ -283,7 +286,14 @@ def main():
                             del Tower.tower_list[:]
                             del Bullet.bullet_list[:]
                             loadMonsters(2)
-                            lines = lines2
+                            with open('assets/map02.txt') as file:
+                                lines = file.readlines()
+                            lines = [x.strip() for x in lines]
+                            for i in lines:
+                                for j in i:
+                                    print(j)
+                                print("\n")
+                            # lines = lines2
 
             if towerType == 1:
                 surface.blit(tower01, (896, 160))
@@ -301,7 +311,7 @@ def main():
                 drawText("enemies down.", 836, 224, 10)
                 drawText("Gold : 30", 836, 234, 10, (255, 193, 7))
 
-            if isOn(mouse_pos)[2] == 9:  # Can put a tower (cursor on grass tile)
+            if isOn(mouse_pos, lines)[2] == 9:  # Can put a tower (cursor on grass tile)
                 canBuild = True
                 pygame.draw.rect(surface, (255, 255, 255), (squareX, squareY, 31, 31), 1)
                 if towerType == 1:
@@ -314,7 +324,7 @@ def main():
                     surface.blit(range03, (squareX + 16 - 50, squareY + 16 - 50))
                     surface.blit(tower03, (squareX, squareY))
             else:
-                pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos)[0] * 32, isOn(mouse_pos)[1] * 32, 31, 31), 1)
+                pygame.draw.rect(surface, (255, 0, 0), (isOn(mouse_pos, lines)[0] * 32, isOn(mouse_pos, lines)[1] * 32, 31, 31), 1)
                 canBuild = False
 
             # Draw and update monsters :
